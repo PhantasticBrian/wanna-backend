@@ -7,6 +7,7 @@ defmodule WannaBackendWeb.Router do
 
   scope "/api", WannaBackendWeb do
     pipe_through :api
+    resources "/users", UserController
   end
 
   # Enables LiveDashboard only for development
