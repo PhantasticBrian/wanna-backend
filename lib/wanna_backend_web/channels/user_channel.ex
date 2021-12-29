@@ -24,7 +24,7 @@ defmodule WannaBackendWeb.UserChannel do
   end
 
   @impl true
-  def handle_in("invite_event", %{event_id <- event_id}, socket) do
+  def handle_in("invite_event", %{"event_id" => event_id}, socket) do
     {:noreply, socket
     |> assign(:events, [])
     |> put_new_events([event_id])}
