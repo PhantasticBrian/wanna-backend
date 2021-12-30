@@ -8,6 +8,7 @@ defmodule WannaBackend.Event do
     field :start_time, :utc_datetime
     field :title, :string
     field :owner_id, :id
+    field :group_id, :id
 
     timestamps()
   end
