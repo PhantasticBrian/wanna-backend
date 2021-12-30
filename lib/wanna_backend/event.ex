@@ -16,6 +16,6 @@ defmodule WannaBackend.Event do
   def changeset(event, attrs) do
     event
     |> cast(attrs, [:title, :start_time, :end_time, :address])
-    |> validate_required([:title, :start_time, :end_time, :address])
+    |> validate_required([:title])
   end
 end

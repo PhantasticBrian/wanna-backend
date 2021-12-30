@@ -18,9 +18,15 @@ defmodule WannaBackendWeb.UserChannel do
 
   @impl true
   # def handle_in("create_event", %{"id" => id, "owner_id" => owner_id, "title" => title, "start" => start, "address" => address, "geolocation" => geolocation}, socket) do
-  def handle_in("create_event", payload, socket) do
-    # Event.create()
-    {:ok, socket}
+  def handle_in("create_event", %{"event" => event, "invites" => invites}, socket) do
+    # Call Events.create_event(payload)
+    result = Events.create_event(event, invites)
+    if result[:ok] do
+      {:ok, %{event: _, user_event: {_, rows}}} = result
+      Enum.map(rows, fn (row) -> row.user_id end)
+      |> Event.notify_users(result[:user_event])
+    end
+    {:reply, result, socket}
   end
 
   @impl true
@@ -31,7 +37,7 @@ defmodule WannaBackendWeb.UserChannel do
   end
 
   @impl true
-  def handle_in("update_event_status", payload, socket) do
+  def handle_in("update_invite_status", payload, socket) do
     {:ok, socket}
   end
 
@@ -64,6 +70,7 @@ defmodule WannaBackendWeb.UserChannel do
       else
         :ok = WannaBackend.Endpoint.subscribe(event)
         assign(acc, :events, [event | events])
+        #TODO: load persisted event data
       end
     end)
   end
