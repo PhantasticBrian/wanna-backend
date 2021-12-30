@@ -1,6 +1,7 @@
 defmodule WannaBackend.Event do
   use Ecto.Schema
   import Ecto.Changeset
+  alias WannaBackend.Accounts.User
 
   schema "events" do
     field :address, :string
@@ -9,6 +10,7 @@ defmodule WannaBackend.Event do
     field :title, :string
     field :owner_id, :id
     field :group_id, :id
+    many_to_many :users, User, join_through: "user_events"
 
     timestamps()
   end

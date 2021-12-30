@@ -4,11 +4,20 @@ defmodule WannaBackend.Events do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Query
   alias Ecto.Multi
 
   alias WannaBackend.Repo
+  alias WannaBackend.Accounts.User
   alias WannaBackend.Event
   alias WannaBackend.UserEvent
+
+  def get_events(user_id, limit \\ 20) do
+    Repo.get(User, user_id)
+    |> Ecto.assoc(:events)
+    |> Query.limit(^limit)
+    |> Repo.all()
+  end
 
   def create(event, invites) do
     Multi.new()
@@ -35,10 +44,10 @@ defmodule WannaBackend.Events do
     |> Repo.transaction()
   end
 
-  def notify_users(invites) do
+  def notify_users(invites, event_id) do
     #TODO: check user presence
     for user_id <- invites do
-      WannaBackend.Endpoint.broadcast! "user:" <> user_id, "invite_event", %{event_id: 1}
+      WannaBackendWeb.Endpoint.broadcast! "user:" <> user_id, "invite_event", %{event_id: event_id}
       #TODO: send push notification to users
     end
   end

@@ -4,27 +4,25 @@ defmodule WannaBackendWeb.UserChannel do
 
   @impl true
   def join("user:" <> user_id, payload, socket) do
-    # if authorized?(payload) do
-    #   {:ok, socket}
-    # else
-    #   {:error, %{reason: "unauthorized"}}
-    # end
-    events = ["test1", "test2"] # TODO: get events from db
+    if authorized?(payload) do
+      events = Events.get_events(user_id)
+      |> Enum.map(fn (event) -> "event:#{event.id}" end)
 
-    {:ok, socket
-      |> assign(:events, [])
-      |> put_new_events(events)}
+      {:ok, socket
+        |> assign(:events, [])
+        |> put_new_events(events)}
+    else
+      {:error, %{reason: "unauthorized"}}
+    end
   end
 
   @impl true
-  # def handle_in("create_event", %{"id" => id, "owner_id" => owner_id, "title" => title, "start" => start, "address" => address, "geolocation" => geolocation}, socket) do
   def handle_in("create_event", %{"event" => event, "invites" => invites}, socket) do
-    # Call Events.create_event(payload)
-    result = Events.create_event(event, invites)
+    result = Events.create(event, invites)
     if result[:ok] do
-      {:ok, %{event: _, user_event: {_, rows}}} = result
+      {:ok, %{event: %{id: event_id}, user_event: {_, rows}}} = result
       Enum.map(rows, fn (row) -> row.user_id end)
-      |> Event.notify_users(result[:user_event])
+      |> Events.notify_users(event_id)
     end
     {:reply, result, socket}
   end
@@ -33,7 +31,7 @@ defmodule WannaBackendWeb.UserChannel do
   def handle_in("invite_event", %{"event_id" => event_id}, socket) do
     {:noreply, socket
     |> assign(:events, [])
-    |> put_new_events([event_id])}
+    |> put_new_events(["event:#{event_id}"])}
   end
 
   @impl true
@@ -68,9 +66,8 @@ defmodule WannaBackendWeb.UserChannel do
       if event in events do
         acc
       else
-        :ok = WannaBackend.Endpoint.subscribe(event)
+        :ok = WannaBackendWeb.Endpoint.subscribe(event)
         assign(acc, :events, [event | events])
-        #TODO: load persisted event data
       end
     end)
   end
