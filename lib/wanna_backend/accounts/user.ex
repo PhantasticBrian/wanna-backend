@@ -8,6 +8,9 @@ defmodule WannaBackend.Accounts.User do
     field :last_name, :string
     field :username, :string
     many_to_many :events, Event, join_through: "user_events"
+    many_to_many :friends, User,
+      join_through: "friendships",
+      join_keys: [from_user_id: :id, to_user_id: :id]
 
     timestamps()
   end
