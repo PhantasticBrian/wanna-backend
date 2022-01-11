@@ -6,6 +6,7 @@ defmodule WannaBackend.Accounts.User do
   alias WannaBackend.Group
   alias WannaBackend.Socials.Friendship
 
+  @derive {Jason.Encoder, only: [:first_name, :last_name, :username]}
   schema "users" do
     field :first_name, :string
     field :last_name, :string

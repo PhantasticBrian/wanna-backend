@@ -19,6 +19,7 @@ defmodule WannaBackendWeb.UserSocket do
   # See the [`Channels guide`](https://hexdocs.pm/phoenix/channels.html)
   # for futher details.
   channel "user:*", WannaBackendWeb.UserChannel
+  channel "social:*", WannaBackendWeb.SocialChannel
   channel "wanna_chat:lobby", WannaBackendWeb.WannaChatChannel
 
   # Socket params are passed from the client and can
