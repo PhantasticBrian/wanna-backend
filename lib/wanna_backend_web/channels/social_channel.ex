@@ -26,6 +26,7 @@ defmodule WannaBackendWeb.SocialChannel do
   def handle_info(:after_join, socket) do
     "social:" <> user_id = socket.topic
     push(socket, "friendships", Socials.get_friendships(user_id))
+    push(socket, "groups", Socials.get_groups(user_id))
     {:noreply, socket}
   end
 
@@ -36,7 +37,7 @@ defmodule WannaBackendWeb.SocialChannel do
 
   def handle_in("groups", _, socket) do
     "social:" <> user_id = socket.topic
-    {:noreply, socket}
+    {:reply, {:ok, Socials.get_groups(user_id)}, socket}
   end
 
   def handle_in("create:friendship", %{"friend_id" => friend_id}, socket) do
@@ -48,6 +49,23 @@ defmodule WannaBackendWeb.SocialChannel do
   def handle_in("remove:friendship", %{"friend_id" => friend_id}, socket) do
     "social:" <> user_id = socket.topic
     res = Socials.remove_friendship(user_id, friend_id)
+    {:reply, res, socket}
+  end
+
+  def handle_in("create:group", %{"name" => name, "code" => code}, socket) do
+    res = Socials.create_group(%{name: name, code: code})
+    {:reply, res, socket}
+  end
+
+  def handle_in("join:group", %{"code" => code}, socket) do
+    "social:" <> user_id = socket.topic
+    res = Socials.join_group(user_id, code)
+    {:reply, res, socket}
+  end
+
+  def handle_in("leave:group", %{"group_id" => group_id}, socket) do
+    "social:" <> user_id = socket.topic
+    res = Socials.leave_group(user_id, group_id)
     {:reply, res, socket}
   end
 

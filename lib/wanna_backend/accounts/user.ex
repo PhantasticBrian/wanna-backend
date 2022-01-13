@@ -3,8 +3,7 @@ defmodule WannaBackend.Accounts.User do
   import Ecto.Changeset
   alias WannaBackend.Accounts.User
   alias WannaBackend.Event
-  alias WannaBackend.Group
-  alias WannaBackend.Socials.Friendship
+  alias WannaBackend.Socials.{Group, Friendship}
 
   @derive {Jason.Encoder, only: [:first_name, :last_name, :username]}
   schema "users" do

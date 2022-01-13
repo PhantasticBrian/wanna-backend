@@ -1,10 +1,15 @@
-defmodule WannaBackend.Group do
+defmodule WannaBackend.Socials.Group do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias WannaBackend.Accounts.User
+
+  @derive {Jason.Encoder, only: [:code, :name]}
   schema "groups" do
     field :code, :string
     field :name, :string
+    many_to_many :users, User, join_through: "user_groups"
+    #TODO: add is_private field
 
     timestamps()
   end
